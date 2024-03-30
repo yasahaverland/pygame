@@ -7,14 +7,14 @@ pygame.init()
 clock = pygame.time.Clock()
 fps = 60
 
-screen_width = 1000
-screen_height = 1000
+screen_width = 800
+screen_height = 800
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Mariow')
 
 # defining game variable
-tile_size = 50
+tile_size = 40
 
 
 # load images
@@ -26,12 +26,15 @@ class Player():
 
         # animation variables
         self.images_right = []
+        self.images_left = []
         self.index = 0
         self.counter = 0
         for num in range (1, 5):
             img_right = pygame.image.load(f'./assets/mario{num}.png')
             img_right = pygame.transform.scale(img_right, (40, 80))
+            img_left = pygame.transform.flip(img_right, True, False) #.flip flips the image according to x and y index, first true flips horizontaly, second - if true flips verlicaly
             self.images_right.append(img_right)
+            self.images_left.append(img_left)
 
         self.image = self.images_right[self.index]
         self.rect = self.image.get_rect()
@@ -39,6 +42,7 @@ class Player():
         self.rect.y = y
         self.vel_y = 0
         self.jumped = False
+        self.direction = 0
 
     def update(self):
         # calculate new player position
@@ -47,6 +51,8 @@ class Player():
         # delta x and y
         dx = 0
         dy = 0
+        # controls the speed - 5 iterations need to pass before the index update
+        walk_cooldown = 5
 
         # get moving events
         key = pygame.key.get_pressed()
@@ -58,8 +64,30 @@ class Player():
             self.jumped = False
         if key[pygame.K_LEFT]:
             dx -= 5
+            self.counter += 1
+            self.direction = -1
         if key[pygame.K_RIGHT]:
             dx += 5
+            self.counter += 1
+            self.direction = 1
+        if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
+            self.counter = 0
+            self.index = 0
+            if self.direction == 1:
+                self.image = self.images_right[self.index]
+            if self.direction == -1:
+                self.image = self.images_left[self.index]
+
+        # handle animation
+        if self.counter > walk_cooldown:
+            self.counter = 0   
+            self.index += 1
+            if self.index >= len(self.images_right):
+                self.index = 0
+            if self.direction == 1:
+                self.image = self.images_right[self.index]
+            if self.direction == -1:
+                self.image = self.images_left[self.index]
 
         # add gravity
         self.vel_y += 1
