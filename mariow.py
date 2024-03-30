@@ -3,6 +3,10 @@ from pygame.locals import *
 
 pygame.init()
 
+# adding frame rate
+clock = pygame.time.Clock()
+fps = 60
+
 screen_width = 1000
 screen_height = 1000
 
@@ -12,9 +16,68 @@ pygame.display.set_caption('Mariow')
 # defining game variable
 tile_size = 50
 
+
 # load images
 bg_img = pygame.image.load('./assets/background.png')
 
+
+class Player():
+    def __init__(self, x, y):
+
+        # animation variables
+        self.images_right = []
+        self.index = 0
+        self.counter = 0
+        for num in range (1, 5):
+            img_right = pygame.image.load(f'./assets/mario{num}.png')
+            img_right = pygame.transform.scale(img_right, (40, 80))
+            self.images_right.append(img_right)
+
+        self.image = self.images_right[self.index]
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.vel_y = 0
+        self.jumped = False
+
+    def update(self):
+        # calculate new player position
+ 
+    
+        # delta x and y
+        dx = 0
+        dy = 0
+
+        # get moving events
+        key = pygame.key.get_pressed()
+
+        if key[pygame.K_SPACE] and self.jumped == False:
+            self.vel_y = -15
+            self.jumped = True
+        if key[pygame.K_SPACE] == False:
+            self.jumped = False
+        if key[pygame.K_LEFT]:
+            dx -= 5
+        if key[pygame.K_RIGHT]:
+            dx += 5
+
+        # add gravity
+        self.vel_y += 1
+        if self.vel_y > 10:
+            self.vel_y = 10
+        dy += self.vel_y
+       # check if collision at new position
+            
+        # adjust player position
+        self.rect.x += dx
+        self.rect.y += dy
+
+        if self.rect.bottom > screen_height:
+            self.rect.bottom = screen_height
+            dy = 0
+
+        # draw player on scren
+        screen.blit(self.image, self.rect)
 
 class World():
     def __init__(self, data):
@@ -96,14 +159,19 @@ world_data = [
 [1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
+player = Player(100, screen_height - 130)
 world = World(world_data)
 
 run = True
 while run:
+
+    # defining frame rate to ensure consistency accross browsers
+    clock.tick(fps)
     # puts the img inside the display in the x and y coordinations inside the ()
     screen.blit(bg_img, (0,0))
 
     world.draw()
+    player.update()
 
     # While user plays the game (event is hapening) run = true
     for event in pygame.event.get():
