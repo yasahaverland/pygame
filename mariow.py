@@ -19,6 +19,7 @@ tile_size = 40
 
 # load images
 bg_img = pygame.image.load('./assets/background.png')
+bg_img = pygame.transform.scale(bg_img, (800, 800))
 jump_img = pygame.image.load('./assets/mario4.png')
 jump_img = pygame.transform.scale(jump_img, (40, 80))
 jump_img_left = pygame.transform.flip(jump_img, True, False)
@@ -64,12 +65,14 @@ class Player():
         if key[pygame.K_SPACE] and self.jumped == False:
             self.vel_y = -15
             self.jumped = True
+            self.image = jump_img
             if self.direction == 1:
                 self.image = jump_img
-            if self.direction == -1:
+            elif self.direction == -1:
                 self.image = jump_img_left
         if key[pygame.K_SPACE] == False:
             self.jumped = False
+
         if key[pygame.K_LEFT]:
             dx -= 5
             self.counter += 1
@@ -78,7 +81,7 @@ class Player():
             dx += 5
             self.counter += 1
             self.direction = 1
-        if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
+        if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False and key[pygame.K_SPACE] == False:
             self.counter = 0
             self.index = 0
             if self.direction == 1:
@@ -127,7 +130,7 @@ class Player():
 
         # draw player on scren
         screen.blit(self.image, self.rect)
-        pygame.draw.rect(screen, (255, 255, 255), self.rect, 2)
+        # pygame.draw.rect(screen, (255, 255, 255), self.rect, 2)
 
 class World():
     def __init__(self, data):
@@ -186,7 +189,7 @@ class World():
         for tile in self.tile_list:
             screen.blit(tile[0], tile[1])
             # utilize the draw function in pygame to help vizualize the colision check
-            pygame.draw.rect(screen, (255, 255, 255), tile[1], 2)
+            # pygame.draw.rect(screen, (255, 255, 255), tile[1], 2)
 
 world_data = [
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
